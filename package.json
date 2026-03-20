@@ -1,0 +1,40 @@
+{
+  "name": "monit_ftth",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.19.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mikro-routeros": "^1.0.6",
+    "net-snmp": "^3.26.1",
+    "node-cron": "^4.2.1",
+    "node-routeros": "^1.6.8",
+    "ssh2": "^1.17.0",
+    "ssh2-promise": "^1.0.3",
+    "telnet-client": "^2.2.11"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/net-snmp": "^3.23.0",
+    "@types/node": "^25.5.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/ssh2": "^1.15.5",
+    "prisma": "^6.19.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

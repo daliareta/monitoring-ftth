@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OltType {
+  ZTE
+  HIOSO
+}
+
+enum OnuStatus {
+  ONLINE
+  LOS
+  OFFLINE
+}
+
+model Olt {
+  id             String     @id @default(uuid())
+  name           String
+  ip_address     String
+  snmp_community String
+  snmp_version   String     @default("v2c")
+  telnet_user    String?
+  telnet_pass    String?
+  type           OltType
+  customers      Customer[]
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+}
+
+model Router {
+  id             String     @id @default(uuid())
+  name           String
+  ip_address     String
+  username       String
+  password       String
+  api_port       Int        @default(8728)
+  location_lat   Float?
+  location_long  Float?
+  customers      Customer[]
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+}
+
+model Odc {
+  id            String   @id @default(uuid())
+  name          String
+  location_lat  Float
+  location_long Float
+  odps          Odp[]
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+model Odp {
+  id            String     @id @default(uuid())
+  name          String
+  odc_id        String
+  odc           Odc        @relation(fields: [odc_id], references: [id])
+  location_lat  Float
+  location_long Float
+  total_ports   Int
+  customers     Customer[]
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
+}
+
+model Customer {
+  id              String       @id @default(uuid())
+  billing_id      String       @unique
+  name            String
+  pppoe_username  String       @unique
+  router_id       String?
+  router          Router?      @relation(fields: [router_id], references: [id])
+  olt_id          String
+  olt             Olt          @relation(fields: [olt_id], references: [id])
+  odp_id          String
+  odp             Odp          @relation(fields: [odp_id], references: [id])
+  odp_port        Int
+  sn_mac          String       @unique
+  rx_installation Float?
+  location_lat    Float
+  location_long   Float
+  modem_ip        String?      // Added for direct modem access
+  metrics         OnuMetrics[]
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+}
+
+model OnuMetrics {
+  id          String    @id @default(uuid())
+  customer_id String
+  customer    Customer  @relation(fields: [customer_id], references: [id])
+  rx_live     Float?
+  tx_live     Float?
+  status      OnuStatus
+  created_at  DateTime  @default(now())
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  title      String
+  message    String
+  type       String   // e.g., "SIGNAL", "NEW_CLIENT", "SYSTEM"
+  severity   String   // e.g., "INFO", "WARNING", "CRITICAL"
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+}

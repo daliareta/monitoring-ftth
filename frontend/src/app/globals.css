@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Tailwind v4 uses @theme for custom variables */
+@theme {
+  --color-primary: oklch(0.6 0.2 250);
+  --color-secondary: oklch(0.3 0.05 250);
+}
+
+/* Base styles in v4 don't strictly require @layer base if using standard CSS */
+body {
+  background-color: black;
+  color: white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Leaflet Dark Customization */
+.leaflet-container {
+  background: #09090b !important;
+}
+
+.dark-popup .leaflet-popup-content-wrapper,
+.dark-popup .leaflet-popup-tip {
+  background: #18181b !important;
+  color: #f4f4f5 !important;
+  border-radius: 12px !important;
+  border: 1px solid #27272a !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Glassmorphism Classes - v4 supports @apply if directives are correct */
+.glass {
+  @apply backdrop-blur-md bg-white/5 border border-white/10;
+}
+
+.form-input {
+  @apply w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-4 focus:ring-blue-600/10 focus:border-blue-500 transition-all placeholder:text-zinc-600;
+}
