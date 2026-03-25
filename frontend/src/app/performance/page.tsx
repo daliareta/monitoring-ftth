@@ -33,7 +33,8 @@ export default function PerformancePage() {
   }, []);
 
   const totalDevices = stats ? ((stats.counts.olts || 0) + (stats.counts.routers || 0)) : 0;
-  const systemIntegrity = stats?.counts.customers > 0 ? 100 : 0;
+  const onlineCustomers = stats?.status.online || 0;
+  const systemIntegrity = (stats?.counts.customers > 0 && onlineCustomers > 0) ? 100 : 0;
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
@@ -53,7 +54,7 @@ export default function PerformancePage() {
               Tangerang - Banten
            </div>
            <div className="px-6 py-3 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-              Uptime: {totalDevices > 0 ? "99.998%" : "---"}
+              Uptime: {onlineCustomers > 0 ? "99.998%" : "---"}
            </div>
         </div>
       </div>
@@ -70,9 +71,9 @@ export default function PerformancePage() {
         />
         <StatsCard 
           title="Avg. Latency" 
-          value={totalDevices > 0 ? "4.2" : "0"} 
+          value={onlineCustomers > 0 ? "4.2" : "0"} 
           unit="ms" 
-          subValue={totalDevices > 0 ? "Real-time response" : "Waiting for hardware"} 
+          subValue={onlineCustomers > 0 ? "Real-time response" : "No active data"} 
           icon={Zap} 
           color="blue" 
         />

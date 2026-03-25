@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import prisma from '../db/prisma.js';
-import { pollOlt } from './snmp.js';
+import { pollOltAdvanced } from './olt-manager.js';
 import { syncPppoeToCustomers } from './mikrotik.js';
 
 export function startSnmpWorker() {
@@ -21,38 +21,36 @@ export function startSnmpWorker() {
         }
       }
 
-      // 1. Fetch all OLTs and their associated Customers
+      // 1. Fetch all OLTs
       const olts = await prisma.olt.findMany({
-        include: {
-          customers: true,
-        },
+        include: { customers: true },
       });
 
-      // 2. Poll each customer's metrics
+      // 2. Poll each OLT (Single walk for all customers)
       for (const olt of olts) {
         if (!olt.customers.length) continue;
 
         console.log(`[Worker] Polling OLT ${olt.name} (${olt.ip_address}) for ${olt.customers.length} customers`);
 
-        for (const customer of olt.customers) {
-          try {
-            // Wait for metrics from the polling service
-            const metrics = await pollOlt(olt.ip_address, olt.snmp_community, olt.type, customer.sn_mac);
-            
-            // 3. Insert into OnuMetrics table
+        try {
+          const oltResults = await pollOltAdvanced(olt.id);
+          
+          for (const result of oltResults) {
             await prisma.onuMetrics.create({
               data: {
-                customer_id: customer.id,
-                rx_live: metrics.rx_live,
-                tx_live: metrics.tx_live,
-                status: metrics.status,
+                customer_id: result.customer_id,
+                rx_live: result.rx_live,
+                tx_live: 0, // TX Power is harder to fetch, keeping as dummy for now or omit
+                status: result.status,
               },
             });
-            console.log(`  -> Customer ${customer.id} metrics recorded.`);
-          } catch (error) {
-            console.error(`  -> Failed to poll customer ${customer.id}:`, error);
-            
-            // Mark as OFFLINE if polling completely fails
+          }
+          console.log(`  -> Recorded metrics for ${oltResults.length} customers on ${olt.name}.`);
+        } catch (error: any) {
+          console.error(`  -> Failed to poll OLT ${olt.name}:`, error.message);
+          
+          // Fallback: Mark all customers for this OLT as OFFLINE if the whole OLT is unreachable
+          for (const customer of olt.customers) {
             await prisma.onuMetrics.create({
               data: {
                 customer_id: customer.id,
