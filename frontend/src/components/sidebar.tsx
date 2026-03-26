@@ -126,5 +126,3 @@ export function Sidebar() {
     </>
   );
 }
-  );
-}

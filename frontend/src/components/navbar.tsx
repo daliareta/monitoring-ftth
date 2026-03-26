@@ -1,8 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu } from "lucide-react";
+import { 
+  Search, 
+  Bell, 
+  Zap, 
+  ChevronRight, 
+  Menu, 
+  Trash2, 
+  XCircle, 
+  AlertTriangle, 
+  Info 
+} from "lucide-react";
 import { useSidebar } from "@/context/sidebar-context";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [notifications, setNotifications] = useState<any[]>([]);
