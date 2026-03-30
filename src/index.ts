@@ -14,6 +14,29 @@ app.use(express.json());
 // Start the background worker
 startSnmpWorker();
 
+// Auto-seed Office Location if DB is empty
+const autoSeed = async () => {
+  try {
+    const existing = await (prisma.router as any).findFirst();
+    if (!existing) {
+      await (prisma.router as any).create({
+        data: {
+          name: 'KANTOR PUSAT / CORE SERVER',
+          ip_address: '10.50.10.1',
+          username: 'admin',
+          password: 'password',
+          location_lat: -6.1285,
+          location_long: 106.46358
+        }
+      });
+      console.log('✅ Auto-Seed: Kantor Pusat successfully pinned to map!');
+    }
+  } catch (err) {
+    console.error('❌ Auto-Seed Error:', err);
+  }
+};
+autoSeed();
+
 // API Routes
 // API Routes
 app.use('/api', apiRouter);

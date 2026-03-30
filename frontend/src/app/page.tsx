@@ -33,6 +33,15 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState<"map" | "provisioning">("map");
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [role, setRole] = useState<string>("admin");
+
+  useEffect(() => {
+    const roleCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("ftth_role="))
+      ?.split("=")[1];
+    if (roleCookie) setRole(roleCookie);
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -95,16 +104,18 @@ export default function Dashboard() {
             >
               <MapIcon size={14} /> <span className="whitespace-nowrap">GIS View</span>
             </button>
-            <button 
-              onClick={() => setActiveView("provisioning")}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                activeView === 'provisioning' 
-                  ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 scale-105' 
-                  : 'text-zinc-500 hover:text-zinc-300'
-              }`}
-            >
-              <Plus size={14} /> <span className="whitespace-nowrap">NOC Tools</span>
-            </button>
+            {role !== 'technician' && (
+              <button 
+                onClick={() => setActiveView("provisioning")}
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                  activeView === 'provisioning' 
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20 scale-105' 
+                    : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+              >
+                <Plus size={14} /> <span className="whitespace-nowrap">NOC Tools</span>
+              </button>
+            )}
           </div>
           <div className="hidden sm:block w-[1px] h-8 bg-zinc-800" />
           <button 

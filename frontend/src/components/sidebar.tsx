@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
@@ -29,12 +30,29 @@ import { X } from "lucide-react";
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [role, setRole] = useState<string>("admin");
   const { isOpen, close } = useSidebar();
+
+  useEffect(() => {
+    const roleCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("ftth_role="))
+      ?.split("=")[1];
+    if (roleCookie) setRole(roleCookie);
+  }, []);
 
   const handleLogout = () => {
     document.cookie = "ftth_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "ftth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     router.push("/login");
   };
+
+  const filteredNavigation = navigation.filter((item) => {
+    if (role === "technician") {
+      return item.name === "Global Map";
+    }
+    return true;
+  });
 
   if (pathname === "/login") return null;
 
@@ -79,7 +97,7 @@ export function Sidebar() {
 
         <nav className="flex-1 space-y-1.5 px-4 mb-8 overflow-y-auto custom-scrollbar">
           <p className="px-4 mb-4 text-[10px] font-black text-zinc-700 uppercase tracking-widest">Navigation</p>
-          {navigation.map((item) => {
+          {filteredNavigation.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -106,11 +124,13 @@ export function Sidebar() {
         <div className="p-6 border-t border-zinc-900/50 mt-auto bg-gradient-to-t from-black to-transparent">
           <div className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-zinc-900/20 border border-zinc-800/30 mb-4 group cursor-default">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-900/20">
-              JD
+              {role === 'technician' ? 'TK' : 'JD'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-white truncate">ADMIN NOC</p>
-              <p className="text-[10px] text-zinc-600 font-bold uppercase truncate tracking-tighter">sanwanay-admin</p>
+              <p className="text-xs font-black text-white truncate">{role === 'technician' ? 'TECHNICIAN' : 'ADMIN NOC'}</p>
+              <p className="text-[10px] text-zinc-600 font-bold uppercase truncate tracking-tighter">
+                {role === 'technician' ? 'sanwanay-tech' : 'sanwanay-admin'}
+              </p>
             </div>
           </div>
           

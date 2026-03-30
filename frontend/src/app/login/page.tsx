@@ -15,6 +15,11 @@ export default function LoginPage() {
     // Static demo credentials for now
     if (username === "admin" && password === "noc123") {
       document.cookie = "ftth_auth=true; path=/; max-age=86400"; // 24h
+      document.cookie = "ftth_role=admin; path=/; max-age=86400";
+      router.push("/");
+    } else if (username === "teknisi" && password === "tk123") {
+      document.cookie = "ftth_auth=true; path=/; max-age=86400"; // 24h
+      document.cookie = "ftth_role=technician; path=/; max-age=86400";
       router.push("/");
     } else {
       setError("Invalid credentials. Please try again.");
